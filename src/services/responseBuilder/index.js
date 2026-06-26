@@ -189,7 +189,9 @@ const buildAgentSummary = ({
   matchedTransaction,
   analysis,
 }) => {
-  const txId = matchedTransaction?.id ?? null;
+  const txId = matchedTransaction
+    ? (matchedTransaction.transaction_id ?? matchedTransaction.id ?? null)
+    : null;
   const amount = formatAmount(analysis?.amount);
 
   const caseLabel = {
@@ -441,8 +443,12 @@ const buildResponse = ({ ticketId, analysis, matchResult, evidence, decision }) 
   const humanReviewRequired = Boolean(decision?.human_review_required);
 
   const matchedTransaction = matchResult?.matchedTransaction ?? null;
+  // Inbound transactions may use either `transaction_id` (spec) or `id`
+  // (legacy/short form). Read both, prefer the spec name.
   const relevantTransactionId = matchedTransaction
-    ? (matchedTransaction.id ?? null)
+    ? (matchedTransaction.transaction_id
+        ?? matchedTransaction.id
+        ?? null)
     : null;
 
   return {
