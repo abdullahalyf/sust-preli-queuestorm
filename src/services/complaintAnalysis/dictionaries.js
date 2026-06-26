@@ -301,6 +301,10 @@ const FRAUD_KEYWORDS = [
 ];
 
 // --- Important keyword categories ---
+// IMPORTANT: The Decision Engine's classifier looks for duplicate_payment
+// signals inside `analysis.important_keywords`, so phrases like 'duplicate',
+// 'twice', 'dobbar', etc. must appear in this section (not in FRAUD_KEYWORDS)
+// to be picked up.
 const IMPORTANT_KEYWORDS = {
   urgency: ['urgent', 'immediately', 'asap', 'right now', 'quickly',
             'জরুরি', 'এক্ষুনি', 'তাড়াতাড়ি'],
@@ -308,6 +312,47 @@ const IMPORTANT_KEYWORDS = {
           'টাকা', 'পয়সা', 'ব্যালেন্স'],
   platforms: ['bkash', 'nagad', 'rocket', 'upay', 'ucash',
               'বিকাশ', 'নগদ', 'রকেট', 'উপায়'],
+
+  // Phrases that signal the customer was charged / paid more than once.
+  // Each keyword must survive normalization intact — so we include both the
+  // canonical English form and common Banglish / Bangla variants. The parser
+  // also recognizes a few of these directly (e.g. 'twice', 'dobbar') but
+  // putting them in IMPORTANT_KEYWORDS guarantees they reach the classifier.
+  duplicate_payment: [
+    // English
+    'duplicate', 'twice', 'double charged', 'charged twice',
+    'same payment', 'same transaction', 'double payment',
+    'duplicate transaction', 'duplicate payment', 'duplicate charge',
+    'deducted twice', 'two times', 'double',
+    // Bangla (Bangla script gets transliterated to English by the normalizer;
+    // the classifier matches on the English transliteration output).
+    'dobbar', 'duibar', 'dui bar', 'double keteche', 'ekoi taka dui bar',
+    'duibar payment',
+    // Banglish (already Latin-script, survives normalization as-is).
+    'double payment', 'duibar charge', 'same payment',
+  ],
+
+  // Phrases that signal a merchant-related settlement delay. The classifier
+  // treats the co-occurrence of a merchant/payment counterparty + one of
+  // these settlement hints as merchant_settlement_delay.
+  merchant_settlement_delay: [
+    // English
+    'merchant settlement', 'merchant settlement delay',
+    'settlement pending', 'merchant payment pending',
+    // Bangla transliterations
+    'merchant settlement hoyni', 'merchant taka paini',
+    'merchant payment pending',
+    // Banglish
+    'merchant settlement hoy nai', 'merchant payment pending',
+  ],
+
+  // Phrases that the Decision Engine checks for merchant_settlement_delay
+  // detection. Adding them here surfaces them in `important_keywords` so the
+  // classifier's co-occurrence rule can fire without modifying the engine.
+  product_fulfilment: [
+    'product', 'goods', 'service', 'order', 'delivery', 'not received',
+    'পণ্য', 'সেবা', 'অর্ডার', 'ডেলিভারি',
+  ],
 };
 
 module.exports = {
