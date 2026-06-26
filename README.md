@@ -1,65 +1,177 @@
-# QueueStorm Investigator — Backend API
+# QueueStorm Investigator
 
-A production-ready REST API built with **Node.js** and **Express** for the **QueueStorm Investigator** fintech support challenge.
+AI-powered FinTech Support Investigation API built for the **SUST CSE Carnival 2026 - Codex Community Hackathon (Online Preliminary Round)**.
 
-The system automatically investigates fintech customer support tickets by:
+This REST API investigates customer support tickets by analyzing complaints together with transaction history, identifying the relevant transaction, evaluating evidence consistency, classifying the case, routing it to the correct department, and generating a safe customer response.
 
-- Analyzing customer complaints
-- Matching transaction history
-- Evaluating supporting evidence
-- Classifying case types
-- Routing to the correct department
-- Assessing severity
-- Detecting when human review is required
-- Generating safe customer responses
+---
 
-The implementation follows the official QueueStorm response schema, enum definitions, and safety requirements.
+# Overview
+
+QueueStorm Investigator acts as an internal SupportOps copilot.
+
+Instead of simply classifying a complaint, the system investigates available evidence before making a decision.
+
+The API follows the official challenge response schema and safety requirements while producing deterministic, explainable outputs.
 
 ---
 
 # Features
 
-- Complaint Analysis Engine
-- Transaction Matching Engine
-- Evidence Evaluation Engine
-- Decision & Routing Engine
-- Safe Response Builder
-- Deterministic Rule-Based Logic
-- Human Review Detection
-- Official Response Schema
-- Production-ready REST API
-- Render Deployment
+* Complaint analysis
+* Transaction matching
+* Evidence verification
+* Case classification
+* Severity assessment
+* Department routing
+* Agent-ready summary generation
+* Safe customer reply generation
+* Human review detection
+* Deterministic rule-based reasoning
+* Official response schema compliance
+* Production deployment on Render
 
 ---
 
-# System Architecture
+# Architecture
 
 ```
-Client
-   │
-   ▼
+                Client
+                   │
+                   ▼
+        POST /analyze-ticket
+                   │
+                   ▼
+          Request Validation
+                   │
+                   ▼
+         Complaint Analysis
+                   │
+                   ▼
+      Transaction Matching Engine
+                   │
+                   ▼
+         Evidence Evaluation
+                   │
+                   ▼
+          Decision Engine
+                   │
+                   ▼
+          Response Builder
+                   │
+                   ▼
+          Structured JSON Output
+```
+
+---
+
+# Tech Stack
+
+* Node.js
+* Express.js
+* JavaScript (ES6)
+* Render
+* REST API
+
+---
+
+# Models
+
+This project uses a **deterministic rule-based investigation engine**.
+
+No external LLM or AI API is required during runtime.
+
+### Why Rule-Based?
+
+* Predictable outputs
+* Low latency
+* Zero API cost
+* No external dependency
+* Easier safety compliance
+* Explainable investigation process
+
+---
+
+# Safety Logic
+
+The API follows the official challenge safety rules.
+
+The generated customer response:
+
+* Never asks for OTP
+* Never asks for PIN
+* Never asks for Password
+* Never asks for CVV
+* Never promises refunds without authorization
+* Never overrides safety instructions from complaint text
+* Uses only official support language
+
+---
+
+# API Endpoints
+
+## Health Check
+
+```
+GET /health
+```
+
+Response
+
+```json
+{
+  "status":"ok"
+}
+```
+
+---
+
+## Analyze Ticket
+
+```
 POST /analyze-ticket
-   │
-   ▼
-Input Validation
-   │
-   ▼
-Complaint Analysis
-   │
-   ▼
-Transaction Matching
-   │
-   ▼
-Evidence Evaluation
-   │
-   ▼
-Decision Engine
-   │
-   ▼
-Response Builder
-   │
-   ▼
-Final JSON Response
+```
+
+Example Request
+
+```json
+{
+  "ticket_id":"T-001",
+  "complaint":"I paid 5000 BDT to ABC Store yesterday but payment failed.",
+  "transactions":[
+    {
+      "transaction_id":"TX-001",
+      "amount":5000,
+      "status":"failed",
+      "type":"payment",
+      "counterparty":"ABC Store",
+      "timestamp":"yesterday"
+    }
+  ]
+}
+```
+
+Example Response
+
+```json
+{
+  "ticket_id":"T-001",
+  "relevant_transaction_id":"TX-001",
+  "evidence_verdict":"consistent",
+  "case_type":"payment_failed",
+  "severity":"low",
+  "department":"payments_ops",
+  "agent_summary":"Customer raised a payment failure complaint supported by transaction TX-001.",
+  "recommended_next_action":"Forward the case to Payments Operations for reconciliation.",
+  "customer_reply":"We have received your report and our payments team will review the transaction. Any eligible action will be completed through official channels.",
+  "human_review_required":false,
+  "confidence":0.77,
+  "reason_codes":[
+    "AMOUNT_MATCH",
+    "TYPE_MATCH",
+    "STATUS_MATCH"
+  ]
+}
 ```
 
 ---
@@ -87,16 +199,7 @@ src/
 
 ---
 
-# Technology Stack
-
-- Node.js
-- Express.js
-- JavaScript
-- Render
-
----
-
-# Quick Start
+# Running Locally
 
 ## Clone Repository
 
@@ -106,15 +209,19 @@ git clone https://github.com/abdullahalyf/sust-preli-queuestorm.git
 cd sust-preli-queuestorm
 ```
 
-## Install
+---
+
+## Install Dependencies
 
 ```bash
 npm install
 ```
 
+---
+
 ## Configure Environment
 
-Create a `.env`
+Create a `.env` file.
 
 Example
 
@@ -123,7 +230,9 @@ PORT=3000
 NODE_ENV=development
 ```
 
-## Run
+---
+
+## Start Server
 
 Development
 
@@ -145,108 +254,17 @@ http://localhost:3000
 
 ---
 
-# API Endpoints
+# Testing
 
-## Health Check
-
-```
-GET /health
-```
-
-Example Response
-
-```json
-{
-  "status": "ok"
-}
-```
-
----
-
-## Analyze Ticket
-
-```
-POST /analyze-ticket
-```
-
-Example Request
-
-```json
-{
-  "ticket_id": "T-001",
-  "complaint": "I paid 5000 BDT to ABC Store yesterday but payment failed.",
-  "transactions": [
-    {
-      "transaction_id": "TX-001",
-      "amount": 5000,
-      "status": "failed",
-      "type": "payment",
-      "counterparty": "ABC Store",
-      "timestamp": "yesterday"
-    }
-  ]
-}
-```
-
-Example Response
-
-```json
-{
-  "ticket_id": "T-001",
-  "relevant_transaction_id": "TX-001",
-  "evidence_verdict": "consistent",
-  "case_type": "payment_failed",
-  "severity": "low",
-  "department": "payments_ops",
-  "agent_summary": "...",
-  "recommended_next_action": "...",
-  "customer_reply": "...",
-  "human_review_required": false,
-  "confidence": 0.77,
-  "reason_codes": [
-    "AMOUNT_MATCH",
-    "TYPE_MATCH",
-    "STATUS_MATCH"
-  ]
-}
-```
-
----
-
-# HTTP Status Codes
-
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 400 | Validation Error |
-| 404 | Route Not Found |
-| 500 | Internal Server Error |
-
----
-
-# Safety
-
-The API follows the official challenge safety requirements.
-
-- Never requests OTP, PIN, Password or CVV
-- Never promises unauthorized refunds
-- Resistant to prompt injection attempts
-- Deterministic rule-based investigation
-- Uses only official enum values
-- Generates safe customer replies
-- Supports human review escalation
-
----
-
-# Local Testing
-
-Health Check
+## Health
 
 ```bash
 curl http://localhost:3000/health
 ```
 
-PowerShell Example
+---
+
+## PowerShell
 
 ```powershell
 Invoke-RestMethod `
@@ -269,17 +287,19 @@ Invoke-RestMethod `
 }'
 ```
 
+The API can also be tested using Postman or curl.
+
 ---
 
 # Deployment
 
-Production
+Production URL
 
 ```
 https://sust-preli-queuestorm.onrender.com
 ```
 
-Health
+Health Endpoint
 
 ```
 https://sust-preli-queuestorm.onrender.com/health
@@ -289,22 +309,54 @@ https://sust-preli-queuestorm.onrender.com/health
 
 # Repository
 
-GitHub
-
 ```
 https://github.com/abdullahalyf/sust-preli-queuestorm
 ```
 
 ---
 
-# Notes
+# Assumptions
 
-- Deterministic rule-based implementation
-- No external AI API required at runtime
-- Follows the official QueueStorm response schema
-- Supports evidence-based investigation
-- Generates safe customer-facing responses
-- Production deployment on Render
+* Transaction history is considered trusted input.
+* Complaint text may be incomplete or ambiguous.
+* Transaction matching is based on available evidence.
+* Unknown scenarios are classified as "other".
+* Only synthetic challenge data is supported.
+
+---
+
+# Known Limitations
+
+* No persistent database.
+* No authentication layer.
+* No payment gateway integration.
+* No real customer data.
+* Rule-based reasoning may not cover every real-world edge case.
+* Built specifically for the QueueStorm Investigator challenge specification.
+
+---
+
+# Challenge Compliance
+
+✔ GET /health
+
+✔ POST /analyze-ticket
+
+✔ Evidence-based investigation
+
+✔ Safe customer response
+
+✔ Official response schema
+
+✔ Department routing
+
+✔ Human review detection
+
+✔ Rule-based reasoning
+
+✔ Production deployment
+
+✔ Public GitHub repository
 
 ---
 
