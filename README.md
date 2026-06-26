@@ -1,63 +1,90 @@
 # QueueStorm Investigator — Backend API
 
-REST API built with **Node.js + Express** for the QueueStorm Investigator fintech support challenge.
+A production-ready REST API built with **Node.js** and **Express** for the **QueueStorm Investigator** fintech support challenge.
 
-> Status: Architecture scaffold only. Business logic intentionally not implemented yet.
+The API automatically investigates customer support tickets by analyzing complaints, matching transaction history, evaluating evidence, classifying the case, and generating safe, structured responses following the official problem statement.
 
 ---
 
-## 📁 Project Structure
+# Features
+
+* Complaint analysis and information extraction
+* Deterministic transaction matching
+* Evidence consistency evaluation
+* Intelligent case classification
+* Department routing
+* Severity assessment
+* Human review detection
+* Safe customer response generation
+* Official response schema compliance
+* Production deployment on Render
+
+---
+
+# Architecture
+
+```
+Client
+   │
+   ▼
+POST /analyze-ticket
+   │
+   ▼
+Request Validation
+   │
+   ▼
+Complaint Analysis
+   │
+   ▼
+Transaction Matching Engine
+   │
+   ▼
+Evidence Engine
+   │
+   ▼
+Decision Engine
+   │
+   ▼
+Response Builder
+   │
+   ▼
+Final JSON Response
+```
+
+---
+
+# Project Structure
 
 ```
 src/
-├── config/          # Environment + app configuration
-├── controllers/     # Route controllers (request/response layer)
-├── routes/          # Express route definitions
-├── services/        # Business logic / service modules
-├── middleware/      # Custom Express middleware (logger, errors, validation)
-├── validators/      # Input validation schemas / rules
-├── utils/           # Shared utility helpers
-├── constants/       # App-wide constants and enums
-├── app.js           # Express app setup
-└── server.js        # HTTP server entry point
+├── config/
+├── constants/
+├── controllers/
+├── middleware/
+├── routes/
+├── services/
+│   ├── complaintAnalysis/
+│   ├── transactionMatcher/
+│   ├── evidenceEngine/
+│   ├── decisionEngine/
+│   └── responseBuilder/
+├── validators/
+├── utils/
+├── app.js
+└── server.js
 ```
 
 ---
 
-## 🚀 Getting Started
+# API Endpoints
 
-### Prerequisites
+## Health Check
 
-- Node.js >= 18
-- npm
-
-### Installation
-
-```bash
-npm install
-cp .env.example .env
+```
+GET /health
 ```
 
-### Running
-
-```bash
-# Development
-npm run dev
-
-# Production
-npm start
-```
-
----
-
-## 🌐 Endpoints
-
-| Method | Endpoint           | Description                          |
-| ------ | ------------------ | ------------------------------------ |
-| GET    | `/health`          | Health check                         |
-| POST   | `/analyze-ticket`  | Analyze a support ticket (placeholder) |
-
-### GET `/health`
+Response
 
 ```json
 {
@@ -65,26 +92,109 @@ npm start
 }
 ```
 
-### POST `/analyze-ticket`
+---
+
+## Analyze Ticket
+
+```
+POST /analyze-ticket
+```
+
+Example Request
 
 ```json
 {
-  "message": "Business logic not implemented yet."
+  "ticket_id": "T-001",
+  "complaint": "I paid 5000 BDT to ABC Store yesterday but payment failed.",
+  "transactions": [
+    {
+      "transaction_id": "TX-001",
+      "amount": 5000,
+      "status": "failed",
+      "type": "payment",
+      "counterparty": "ABC Store",
+      "timestamp": "yesterday"
+    }
+  ]
+}
+```
+
+Example Response
+
+```json
+{
+  "ticket_id": "T-001",
+  "relevant_transaction_id": "TX-001",
+  "evidence_verdict": "consistent",
+  "case_type": "payment_failed",
+  "severity": "low",
+  "department": "payments_ops",
+  "agent_summary": "...",
+  "recommended_next_action": "...",
+  "customer_reply": "...",
+  "human_review_required": false,
+  "confidence": 0.77,
+  "reason_codes": [
+    "AMOUNT_MATCH",
+    "TYPE_MATCH",
+    "STATUS_MATCH"
+  ]
 }
 ```
 
 ---
 
-## 🚢 Deployment (Render)
+# Safety
 
-1. Push to a Git provider.
-2. Create a new **Web Service** on Render.
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Add environment variables from `.env.example`.
+The API follows the challenge safety requirements.
+
+* Never requests OTP, PIN, Password or CVV.
+* Never promises unauthorized refunds.
+* Resistant to prompt-injection style complaint text.
+* Uses deterministic rule-based investigation.
+* Returns only official enum values defined in the problem statement.
 
 ---
 
-## 📝 License
+# Technology Stack
 
-MIT
+* Node.js
+* Express.js
+* JavaScript
+* Render
+
+---
+
+# Local Development
+
+```bash
+npm install
+cp .env.example .env
+npm start
+```
+
+---
+
+# Production
+
+Render Deployment
+
+https://sust-preli-queuestorm.onrender.com
+
+Health Endpoint
+
+https://sust-preli-queuestorm.onrender.com/health
+
+---
+
+# Repository
+
+GitHub
+
+https://github.com/abdullahalyf/sust-preli-queuestorm
+
+---
+
+# License
+
+MIT License
