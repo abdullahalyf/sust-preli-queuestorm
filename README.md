@@ -2,26 +2,37 @@
 
 A production-ready REST API built with **Node.js** and **Express** for the **QueueStorm Investigator** fintech support challenge.
 
-The API automatically investigates customer support tickets by analyzing complaints, matching transaction history, evaluating evidence, classifying the case, and generating safe, structured responses following the official problem statement.
+The system automatically investigates fintech customer support tickets by:
+
+- Analyzing customer complaints
+- Matching transaction history
+- Evaluating supporting evidence
+- Classifying case types
+- Routing to the correct department
+- Assessing severity
+- Detecting when human review is required
+- Generating safe customer responses
+
+The implementation follows the official QueueStorm response schema, enum definitions, and safety requirements.
 
 ---
 
 # Features
 
-* Complaint analysis and information extraction
-* Deterministic transaction matching
-* Evidence consistency evaluation
-* Intelligent case classification
-* Department routing
-* Severity assessment
-* Human review detection
-* Safe customer response generation
-* Official response schema compliance
-* Production deployment on Render
+- Complaint Analysis Engine
+- Transaction Matching Engine
+- Evidence Evaluation Engine
+- Decision & Routing Engine
+- Safe Response Builder
+- Deterministic Rule-Based Logic
+- Human Review Detection
+- Official Response Schema
+- Production-ready REST API
+- Render Deployment
 
 ---
 
-# Architecture
+# System Architecture
 
 ```
 Client
@@ -30,16 +41,16 @@ Client
 POST /analyze-ticket
    │
    ▼
-Request Validation
+Input Validation
    │
    ▼
 Complaint Analysis
    │
    ▼
-Transaction Matching Engine
+Transaction Matching
    │
    ▼
-Evidence Engine
+Evidence Evaluation
    │
    ▼
 Decision Engine
@@ -76,6 +87,64 @@ src/
 
 ---
 
+# Technology Stack
+
+- Node.js
+- Express.js
+- JavaScript
+- Render
+
+---
+
+# Quick Start
+
+## Clone Repository
+
+```bash
+git clone https://github.com/abdullahalyf/sust-preli-queuestorm.git
+
+cd sust-preli-queuestorm
+```
+
+## Install
+
+```bash
+npm install
+```
+
+## Configure Environment
+
+Create a `.env`
+
+Example
+
+```env
+PORT=3000
+NODE_ENV=development
+```
+
+## Run
+
+Development
+
+```bash
+npm run dev
+```
+
+Production
+
+```bash
+npm start
+```
+
+Server
+
+```
+http://localhost:3000
+```
+
+---
+
 # API Endpoints
 
 ## Health Check
@@ -84,7 +153,7 @@ src/
 GET /health
 ```
 
-Response
+Example Response
 
 ```json
 {
@@ -144,46 +213,77 @@ Example Response
 
 ---
 
+# HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Validation Error |
+| 404 | Route Not Found |
+| 500 | Internal Server Error |
+
+---
+
 # Safety
 
-The API follows the challenge safety requirements.
+The API follows the official challenge safety requirements.
 
-* Never requests OTP, PIN, Password or CVV.
-* Never promises unauthorized refunds.
-* Resistant to prompt-injection style complaint text.
-* Uses deterministic rule-based investigation.
-* Returns only official enum values defined in the problem statement.
-
----
-
-# Technology Stack
-
-* Node.js
-* Express.js
-* JavaScript
-* Render
+- Never requests OTP, PIN, Password or CVV
+- Never promises unauthorized refunds
+- Resistant to prompt injection attempts
+- Deterministic rule-based investigation
+- Uses only official enum values
+- Generates safe customer replies
+- Supports human review escalation
 
 ---
 
-# Local Development
+# Local Testing
+
+Health Check
 
 ```bash
-npm install
-cp .env.example .env
-npm start
+curl http://localhost:3000/health
+```
+
+PowerShell Example
+
+```powershell
+Invoke-RestMethod `
+-Uri http://localhost:3000/analyze-ticket `
+-Method POST `
+-ContentType "application/json" `
+-Body '{
+  "ticket_id":"T-001",
+  "complaint":"I paid 5000 BDT to ABC Store yesterday but payment failed.",
+  "transactions":[
+    {
+      "transaction_id":"TX-001",
+      "amount":5000,
+      "status":"failed",
+      "type":"payment",
+      "counterparty":"ABC Store",
+      "timestamp":"yesterday"
+    }
+  ]
+}'
 ```
 
 ---
 
-# Production
+# Deployment
 
-Render Deployment
+Production
 
+```
 https://sust-preli-queuestorm.onrender.com
+```
 
-Health Endpoint
+Health
 
+```
 https://sust-preli-queuestorm.onrender.com/health
+```
 
 ---
 
@@ -191,7 +291,20 @@ https://sust-preli-queuestorm.onrender.com/health
 
 GitHub
 
+```
 https://github.com/abdullahalyf/sust-preli-queuestorm
+```
+
+---
+
+# Notes
+
+- Deterministic rule-based implementation
+- No external AI API required at runtime
+- Follows the official QueueStorm response schema
+- Supports evidence-based investigation
+- Generates safe customer-facing responses
+- Production deployment on Render
 
 ---
 
