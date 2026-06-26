@@ -98,7 +98,11 @@ const classifyCase = (analysis, matchResult, evidence) => {
   const counterparty = (analysis?.counterparty_reference || '').toLowerCase();
   const typeIsPayment = (analysis?.transaction_type || '').toLowerCase() === 'payment';
   const noProductHints = important.some((k) =>
-    ['product', 'goods', 'service', 'order', 'delivery', 'not received'].includes(k));
+    [
+      'product', 'goods', 'service', 'order', 'delivery', 'not received',
+      'settlement', 'merchant settlement', 'settlement pending',
+      'merchant payment pending',
+    ].includes(k));
   if (
     (counterparty.includes('merchant') || typeIsPayment)
     && noProductHints

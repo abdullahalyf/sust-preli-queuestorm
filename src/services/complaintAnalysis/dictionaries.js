@@ -338,12 +338,18 @@ const IMPORTANT_KEYWORDS = {
   merchant_settlement_delay: [
     // English
     'merchant settlement', 'merchant settlement delay',
-    'settlement pending', 'merchant payment pending',
+    'merchant settlement pending', 'settlement pending',
+    'merchant has not received settlement',
+    'merchant payment pending',
+    'merchant settlement delayed',
+    'settlement not received',
     // Bangla transliterations
     'merchant settlement hoyni', 'merchant taka paini',
-    'merchant payment pending',
+    'merchant payment hoyni',
     // Banglish
     'merchant settlement hoy nai', 'merchant payment pending',
+    'settlement pai nai', 'merchant taka pai nai',
+    'merchant payment hoy nai',
   ],
 
   // Phrases that the Decision Engine checks for merchant_settlement_delay
