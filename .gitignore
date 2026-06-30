@@ -1,56 +1,49 @@
 # Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*.local
 
-# Build output
-dist/
-build/
-*.tsbuildinfo
-
 # Logs
 logs/
 *.log
+server.log
+server.err
+dbg.mjs
+
+# Build output
+dist/
+build/
+coverage/
+.nyc_output/
+*.tsbuildinfo
 
 # IDE / Editor
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# OS
 .DS_Store
-
-# Testing / Coverage
-coverage/
-.nyc_output/
-
-# OS files
 Thumbs.db
 
-# Render / Deploy
+# Deployment
 .render/
 
-# Puku
+# AI / Puku
 .puku/
 
-# Node
-node_modules/
-
-# Environment
-.env
-
-# Logs
-logs/
-*.log
-
-#roadmap
-AI_ROADMAP.md
+# AI Planning
+AI_CONTEXT.md
 DECISIONS.md
 ROADMAP.md
 TODO.md
+SESSION_SUMMARY.md
+
+# Temporary files
+*.tmp
+*.temp
+*.tmp.md
