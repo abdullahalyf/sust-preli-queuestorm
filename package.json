@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "build:css": "npx --yes tailwindcss@3.4.13 -c tailwind.config.js -i public/tw-input.css -o public/tailwind.css --minify",
     "test": "echo \"Error: no tests specified yet\" && exit 1"
   },
   "keywords": [
