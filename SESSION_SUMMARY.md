@@ -445,5 +445,112 @@ Live URL:     https://sust-preli-queuestorm.onrender.com/  (UI)
               https://sust-preli-queuestorm.onrender.com/analyze-ticket  (POST triage)
 Total commits on main from this project: 2 (bc49d3f, af962f4) + merge chain
 Tasks closed: 17/17
-Cold-start collapse risk: mitigated (Cron Job is the only remaining manual step)
+Cold-start collapse risk: mitigated (Cron Job is the only remaini
+---
+
+# Session Addendum #3 — Futuristic Triage Cockpit (1 Jul 2026)
+
+**Branch:** `main`
+**Commit:** `2d337da`
+**Scope:** Visual + interaction polish on the working frontend. Backend contract unchanged.
+
+## What Shipped
+
+| File                  | Change                                                                                              | Size    |
+| --------------------- | --------------------------------------------------------------------------------------------------- | ------- |
+| `public/index.html`   | Rewrite: aurora bg, glass header/cards, pipeline strip, verdict ring SVG, evidence ribbon, reason bars | 8292b   |
+| `public/app.js`       | Rewrite: state machine, runPipelineSimulation, typewriter reply, ring renderer, reason bars, reduced-motion gate | 21773b  |
+| `public/style.css`    | Expansion: aurora keyframes, radar pulse, pipeline sweep, verdict-ring conic, typewriter caret, chip glow, reason bars, reduced-motion media query | 11395b  |
+| `public/tailwind.css` | Rebuilt with new utility classes                                                                    | 12342b  |
+| `public/icons.js` (NEW) | 15 inline SVG icons on `window.QSIcons`, no fetch, no CDN                                         | 2405b   |
+
+**Live bundle sizes (post-deploy):**
+```
+/             8292b   text/html
+/icons.js    2405b   application/javascript   (NEW)
+/app.js     21773b   application/javascript
+/tailwind.css 12342b   text/css
+/style.css  11395b   text/css
+/health      {"status":"ok"}
+```
+
+## Design Decisions (U1-U10)
+
+- **U1 Aurora**: pure CSS conic+radial gradients with a 40s drift animation. No canvas, no library, no extra request.
+- **U2 Glass**: `backdrop-filter: blur(18px) saturate(140%)` + 1px border at 12% opacity + inset highlight.
+- **U3 Pipeline strip**: 5 stages (validate -> analyze -> match -> evidence -> decide) with timed transitions at 0/240/620/960/1280 ms. Driven by a `data-stage` attribute toggled from JS.
+- **U4 Typewriter**: `insertAdjacentText` (never `innerHTML`) at 18 ms/char, abortable via `state.abortTypewriter` so back-to-back Analyze clicks do not pile up.
+- **U5 Verdict ring**: SVG `stroke-dashoffset` animated over 1.2s `cubic-bezier(0.16, 1, 0.3, 1)`; stroke color tracks severity (emerald/amber/rose).
+- **U6 Evidence ribbon**: native `<details>` (accessible, zero-JS expand). Reason codes render as mini bars using a weight table (`AMOUNT_MATCH: 0.30`, etc.) -- illustrative, real confidence still lives in `d.confidence`.
+- **U7 One light dep**: 15 inline SVGs as `window.QSIcons`. Zero CDN, zero fetch. ~2.4 KB.
+- **U8 No additional runtime deps**, no command palette, no history panel (user opted out).
+- **U9 Animations gated by `prefers-reduced-motion`.** Reduced-motion users skip per-stage animation and get the full result instantly.
+- **U10 Theme stays dark**; accent emerald->cyan on hover/active states. Hackathon continuity.
+
+## XSS Audit
+
+Every interpolation that touches user-controlled data is escaped via `esc()` or routed through `insertAdjacentText`:
+
+```
+sev                          -> esc(sev)              (app.js)
+verdict                      -> esc(verdict)
+d.case_type                  -> esc(d.case_type)
+d.department                 -> esc(d.department)
+d.human_review_required      -> boolean only
+d.relevant_transaction_id    -> esc()
+d.agent_summary              -> esc()
+d.recommended_next_action    -> esc()
+d.customer_reply             -> insertAdjacentText    (typewriter)
+d.reason_codes               -> esc() per item        (renderReasonRows)
+```
+
+## Verification
+
+- `node --check public/app.js`: OK
+- `node --check public/icons.js`: OK
+- Tailwind bundle: 12342 bytes (under 15 KB cap)
+- Total client bundle: ~57 KB (HTML+CSS+JS+icons) -- under 100 KB target
+- Hard-refresh `https://sust-preli-queuestorm.onrender.com/` to see the new UI
+- All 5 static assets serve 200 from Render
+
+## What Is NOT in This Upgrade (per user opt-out)
+
+- Command palette (Ctrl/Cmd+K)
+- Investigation history panel
+- Light-mode toggle
+- WebSocket/SSE streaming of the backend's actual pipeline (backend is a single POST)
+
+## Pipeline Visual Timing Rationale
+
+Real backend is one `POST /analyze-ticket` (typically 0.8-1.5s). Five visual stages make it feel orchestrated without lying about backend latency. Stage timings chosen so the slowest visible stage (`decide` at 1280ms) lands slightly before the network response -- the user sees `decide` illuminate, then the result appears. If the backend is slower (cold start), stages feel deliberate rather than laggy.
+
+## If You Want to Tweak
+
+- **Faster / slower typewriter**: edit `const speed = 18;` in `typewriter()` (`public/app.js`).
+- **Pipeline timings**: `const STAGE_TIMINGS` near the top of `public/app.js`.
+- **Reason weights**: `const REASON_WEIGHTS` in `public/app.js` (purely visual -- backend truth stays in `d.confidence`).
+- **Disable typewriter**: set `prefers-reduced-motion: reduce` in browser, or remove the call from `renderResult()`.
+- **Add icons**: append to the `icons` object in `public/icons.js`. 24x24 viewBox 0 0 24 24, stroke-only.
+- **Rebuild Tailwind**: `npm run build:css`.
+
+## Live Layout (ASCII sketch)
+
+```
++--------------------------------------------------------------------+
+| [bolt] QueueStorm Investigator          [SUST Preli . 2026]        |
+|       Evidence-based fintech support triage           [Online]     |
++--------------------------------------------------------------------+
+| INVESTIGATION PIPELINE                                stage: idle   |
+|  [1 Validate]  [2 Complaint]  [3 Match]  [4 Evidence]  [5 Decide]   |
++--------------------------+-----------------------------------------+
+| TICKET INTAKE            |  +-----------+  +--Matched tx-------+   |
+| Ticket ID    [T-001]     |  |           |  | TX-001            |   |
+| Complaint    [textarea]  |  |    77%    |  +--Agent summary----+   |
+| Transactions [TX-001]    |  |           |  | Recommended action|   |
+| [+ Add row]              |  +-----------+  +-------------------+   |
+|                          |                                         |
+| [Analyze] [Sample] [Clr] |  Customer reply  ~ typewritten ~         |
+|                          |                                         |
+|                          |  > Evidence breakdown (5 rules)          |
++--------------------------+-----------------------------------------+
 ```
