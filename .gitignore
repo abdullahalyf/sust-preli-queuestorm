@@ -48,3 +48,9 @@ node_modules/
 # Logs
 logs/
 *.log
+
+#roadmap
+AI_ROADMAP.md
+DECISIONS.md
+ROADMAP.md
+TODO.md

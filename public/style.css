@@ -1,83 +1,329 @@
-/* QueueStorm frontend — minimal polish layer.
- * Tailwind CDN handles 95% of styling; this file adds the few things
- * Tailwind utility classes can't express cleanly in markup.
+/* QueueStorm Investigator — futuristic design layer
+ * Pairs with self-hosted Tailwind. Animations respect prefers-reduced-motion.
  */
 
+/* ============ Foundation ============ */
+:root {
+  --emerald: #10b981;
+  --emerald-soft: #34d399;
+  --cyan: #22d3ee;
+  --rose: #fb7185;
+  --amber: #fbbf24;
+  --slate-950: #020617;
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+}
+
 html {
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  position: relative;
+  background: var(--slate-950);
 }
 
-/* Inputs feel slightly cleaner with native-feeling carets */
-input,
-textarea {
-  caret-color: #34d399; /* emerald-400 */
-}
-
-/* Remove number-input spinners — they look noisy in dark UI */
+input, textarea { caret-color: var(--emerald-soft); }
 input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+::selection { background: rgba(16, 185, 129, 0.3); color: #f8fafc; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--slate-800); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--slate-700); }
+
+/* ============ Aurora background ============ */
+.aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(16, 185, 129, 0.18), transparent 60%),
+    radial-gradient(ellipse 40% 35% at 80% 20%, rgba(34, 211, 238, 0.14), transparent 60%),
+    radial-gradient(ellipse 45% 40% at 70% 80%, rgba(99, 102, 241, 0.12), transparent 60%),
+    radial-gradient(ellipse 35% 30% at 10% 90%, rgba(244, 114, 182, 0.08), transparent 60%);
+  filter: blur(20px);
+  animation: auroraDrift 40s ease-in-out infinite alternate;
 }
-input[type="number"] {
-  -moz-appearance: textfield;
+.aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+@keyframes auroraDrift {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(-3%, 2%, 0) rotate(2deg); }
+  100% { transform: translate3d(2%, -1%, 0) rotate(-1deg); }
 }
 
-/* Fade-in for result panel swap */
-.fade-in {
-  animation: fadeIn 280ms ease-out both;
+/* ============ Glass panel ============ */
+.glass {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.62));
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px -24px rgba(0, 0, 0, 0.6);
 }
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
+.glass-soft {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+/* ============ Header health radar ============ */
+.radar-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--emerald);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: radarPulse 2.4s ease-out infinite;
+}
+.radar-dot.down { background: var(--rose); box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.6); animation-name: radarPulseRose; }
+.radar-dot.checking { background: var(--amber); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.6); animation-name: radarPulseAmber; }
+@keyframes radarPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+@keyframes radarPulseRose { 0% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.55); } 70% { box-shadow: 0 0 0 10px rgba(251, 113, 133, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0); } }
+@keyframes radarPulseAmber { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+
+/* ============ Pipeline strip ============ */
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.pipeline-stage {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--slate-400);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.pipeline-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.12), transparent);
+  transform: translateX(-100%);
+  transition: transform 600ms ease;
+}
+.pipeline-stage.active {
+  color: var(--emerald-soft);
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.06);
+  box-shadow: 0 0 24px -8px rgba(16, 185, 129, 0.4);
+}
+.pipeline-stage.active::before { animation: sweep 1.4s ease-in-out infinite; }
+.pipeline-stage.done {
+  color: var(--slate-200);
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.04);
+}
+.pipeline-stage .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--slate-400);
+}
+.pipeline-stage.active .num { background: var(--emerald); color: var(--slate-950); }
+.pipeline-stage.done .num { background: rgba(16, 185, 129, 0.3); color: var(--emerald-soft); }
+@keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* ============ Verdict ring ============ */
+.verdict-ring {
+  position: relative;
+  width: 168px;
+  height: 168px;
+}
+.verdict-ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.verdict-ring .ring-track { stroke: rgba(148, 163, 184, 0.12); fill: none; stroke-width: 10; }
+.verdict-ring .ring-fill {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1200ms cubic-bezier(0.16, 1, 0.3, 1), stroke 400ms ease;
+}
+.verdict-ring .ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.verdict-ring .ring-pct {
+  font-size: 36px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #f8fafc, #94a3b8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.02em;
+}
+.verdict-ring .ring-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--slate-400);
+  margin-top: 2px;
+}
+
+/* ============ Typewriter ============ */
+.typewriter { display: inline; white-space: pre-wrap; }
+.typewriter-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--emerald-soft);
+  animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
+
+/* ============ Reason mini bars ============ */
+.reason-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+.reason-row .label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--slate-200);
+  letter-spacing: 0.04em;
+}
+.reason-row .bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.1);
+  overflow: hidden;
+}
+.reason-row .bar > i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--emerald), var(--cyan));
+  transition: width 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reason-row .score {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--slate-400);
+}
+
+/* ============ Chip-glow badges ============ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.chip:hover { transform: translateY(-1px); }
+.chip-emerald  { color: var(--emerald-soft); background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 18px -6px rgba(16, 185, 129, 0.5); }
+.chip-rose     { color: var(--rose);         background: rgba(251, 113, 133, 0.08); border-color: rgba(251, 113, 133, 0.3); box-shadow: 0 0 18px -6px rgba(251, 113, 133, 0.5); }
+.chip-amber    { color: var(--amber);        background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.3); box-shadow: 0 0 18px -6px rgba(251, 191, 36, 0.4); }
+.chip-slate    { color: var(--slate-200);    background: rgba(148, 163, 184, 0.06); border-color: rgba(148, 163, 184, 0.18); }
+.chip-cyan     { color: var(--cyan);         background: rgba(34, 211, 238, 0.08); border-color: rgba(34, 211, 238, 0.3); box-shadow: 0 0 18px -6px rgba(34, 211, 238, 0.5); }
+
+/* ============ Icon helper ============ */
+.qsi-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.qsi-icon svg { width: 100%; height: 100%; }
+.qsi-icon-lg { width: 22px; height: 22px; }
+
+/* ============ Generic keyframes (kept from before) ============ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 280ms ease-out both; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 0.9s linear infinite; }
+
+/* ============ Evidence ribbon ============ */
+.evidence-ribbon summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  transition: border-color 200ms ease, background 200ms ease;
+}
+.evidence-ribbon summary::-webkit-details-marker { display: none; }
+.evidence-ribbon summary:hover { border-color: rgba(16, 185, 129, 0.4); }
+.evidence-ribbon[open] summary { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.04); }
+.evidence-ribbon .chev { transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); }
+.evidence-ribbon[open] .chev { transform: rotate(90deg); }
+.evidence-ribbon .body { padding: 12px 4px 0; }
+
+/* ============ Reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .aurora { animation: none; }
+  .radar-dot { animation: none; }
 }
-
-/* Spinner keyframes (Tailwind has animate-spin, but explicit is faster) */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.animate-spin {
-  animation: spin 0.9s linear infinite;
-}
-
-/* Subtle scrollbar in dark theme */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b; /* slate-800 */
-  border-radius: 6px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155; /* slate-700 */
-}
-
-/* Confidence bar fill animates via JS-set width; ensure transition works */
-.confidence-fill {
-  transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Selected text in dark UI */
-::selection {
-  background: rgba(16, 185, 129, 0.3); /* emerald-500/30 */
-  color: #f8fafc;
+.rm-motion *, .rm-motion *::before, .rm-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
 }
