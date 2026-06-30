@@ -308,9 +308,9 @@
     const reasons = Array.isArray(d.reason_codes) ? d.reason_codes : [];
 
     $("#outputContent").innerHTML = `
-      <div class="space-y-5 fade-in">
+      <div class="space-y-3 fade-in">
         <!-- Header strip: badges -->
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-1.5">
           <span class="chip ${sevChip}"><span class="qsi-icon" data-icon="alert"></span>severity · ${esc(sev)}</span>
           <span class="chip ${verdictChip}"><span class="qsi-icon" data-icon="check"></span>evidence · ${esc(verdict)}</span>
           <span class="chip chip-cyan"><span class="qsi-icon" data-icon="layers"></span>case · ${esc(d.case_type || "—")}</span>
@@ -320,8 +320,8 @@
             : ""}
         </div>
 
-        <!-- Verdict ring + matched tx -->
-        <div class="grid md:grid-cols-[168px_1fr] gap-6 items-center">
+        <!-- Verdict ring + matched tx + summary -->
+        <div class="grid grid-cols-[120px_1fr] gap-4 items-center">
           <div class="verdict-ring" role="img" aria-label="Confidence ${pct} percent">
             <svg viewBox="0 0 120 120">
               <circle class="ring-track" cx="60" cy="60" r="${R}"></circle>
@@ -336,54 +336,53 @@
               <div class="ring-label">Confidence</div>
             </div>
           </div>
-          <div class="space-y-3">
-            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-400">Matched transaction</div>
-            <div class="text-base text-slate-100 font-mono">
+          <div class="space-y-2 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] uppercase tracking-[0.18em] text-slate-400">Matched</span>
               ${d.relevant_transaction_id
                 ? `<span class="chip chip-emerald"><span class="qsi-icon" data-icon="pulse"></span>${esc(d.relevant_transaction_id)}</span>`
-                : `<span class="text-slate-500 text-sm">No relevant transaction matched.</span>`}
+                : `<span class="text-slate-500 text-xs">No relevant transaction matched.</span>`}
             </div>
-            <div class="grid sm:grid-cols-2 gap-3 pt-1">
-              <div class="glass-soft rounded-xl p-3">
-                <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500 mb-1">Agent summary</div>
-                <p class="text-sm text-slate-200 leading-relaxed">${esc(d.agent_summary || "")}</p>
-              </div>
-              <div class="glass-soft rounded-xl p-3">
-                <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500 mb-1">Recommended action</div>
-                <p class="text-sm text-slate-200 leading-relaxed">${esc(d.recommended_next_action || "")}</p>
-              </div>
+            <div class="glass-soft rounded-lg p-2.5">
+              <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500 mb-0.5">Agent summary</div>
+              <p class="text-xs text-slate-200 leading-snug">${esc(d.agent_summary || "")}</p>
+            </div>
+            <div class="glass-soft rounded-lg p-2.5">
+              <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500 mb-0.5">Recommended action</div>
+              <p class="text-xs text-slate-200 leading-snug">${esc(d.recommended_next_action || "")}</p>
             </div>
           </div>
         </div>
 
-        <!-- Customer reply with typewriter -->
-        <div class="glass-soft rounded-xl p-4">
-          <div class="flex items-center justify-between mb-2">
-            <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Customer reply</div>
-            <button id="copyBtn" type="button"
-              class="text-[10px] uppercase tracking-[0.18em] glass-soft hover:bg-slate-700/60 text-slate-300 px-2.5 py-1 rounded transition flex items-center gap-1.5">
-              <span class="qsi-icon" data-icon="copy"></span><span id="copyLabel">Copy</span>
-            </button>
+        <!-- Customer reply + evidence ribbon side-by-side on wide screens -->
+        <div class="grid ${reasons.length ? "xl:grid-cols-2" : ""} gap-3">
+          <div class="glass-soft rounded-xl p-3">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500">Customer reply</div>
+              <button id="copyBtn" type="button"
+                class="text-[10px] uppercase tracking-[0.18em] glass-soft hover:bg-slate-700/60 text-slate-300 px-2 py-0.5 rounded transition flex items-center gap-1.5">
+                <span class="qsi-icon" data-icon="copy"></span><span id="copyLabel">Copy</span>
+              </button>
+            </div>
+            <p id="replyText" class="text-xs text-slate-100 leading-relaxed min-h-[2.5rem]"></p>
           </div>
-          <p id="replyText" class="text-sm text-slate-100 leading-relaxed min-h-[3.5rem]"></p>
-        </div>
 
-        <!-- Evidence ribbon -->
-        ${reasons.length
-          ? `<details class="evidence-ribbon group">
-              <summary>
-                <div class="flex items-center gap-3">
-                  <span class="qsi-icon text-emerald-400" data-icon="layers"></span>
-                  <div>
-                    <div class="text-sm text-slate-100 font-medium">Evidence breakdown</div>
-                    <div class="text-[11px] text-slate-500">${reasons.length} rule${reasons.length === 1 ? "" : "s"} contributed to this verdict</div>
+          ${reasons.length
+            ? `<details class="evidence-ribbon group" open>
+                <summary>
+                  <div class="flex items-center gap-2">
+                    <span class="qsi-icon text-emerald-400" data-icon="layers"></span>
+                    <div>
+                      <div class="text-xs text-slate-100 font-medium">Evidence breakdown</div>
+                      <div class="text-[10px] text-slate-500">${reasons.length} rule${reasons.length === 1 ? "" : "s"}</div>
+                    </div>
                   </div>
-                </div>
-                <span class="qsi-icon chev text-slate-400" data-icon="arrowRight"></span>
-              </summary>
-              <div class="body space-y-2" id="reasonList"></div>
-            </details>`
-          : ""}
+                  <span class="qsi-icon chev text-slate-400" data-icon="arrowRight"></span>
+                </summary>
+                <div class="body space-y-1.5" id="reasonList"></div>
+              </details>`
+            : ""}
+        </div>
       </div>
     `;
     paintIcons();
