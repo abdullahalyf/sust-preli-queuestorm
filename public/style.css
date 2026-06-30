@@ -1,0 +1,83 @@
+/* QueueStorm frontend — minimal polish layer.
+ * Tailwind CDN handles 95% of styling; this file adds the few things
+ * Tailwind utility classes can't express cleanly in markup.
+ */
+
+html {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* Inputs feel slightly cleaner with native-feeling carets */
+input,
+textarea {
+  caret-color: #34d399; /* emerald-400 */
+}
+
+/* Remove number-input spinners — they look noisy in dark UI */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Fade-in for result panel swap */
+.fade-in {
+  animation: fadeIn 280ms ease-out both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spinner keyframes (Tailwind has animate-spin, but explicit is faster) */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+/* Subtle scrollbar in dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b; /* slate-800 */
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155; /* slate-700 */
+}
+
+/* Confidence bar fill animates via JS-set width; ensure transition works */
+.confidence-fill {
+  transition: width 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Selected text in dark UI */
+::selection {
+  background: rgba(16, 185, 129, 0.3); /* emerald-500/30 */
+  color: #f8fafc;
+}
