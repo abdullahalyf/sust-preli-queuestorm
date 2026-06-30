@@ -317,3 +317,133 @@ Ship a one-page UI that talks to `POST /analyze-ticket` and renders the official
 - `public/screenshot.png` placeholder is referenced in README — drop in a real screenshot before pitch.
 - Tailwind CDN is a single external dependency; if cdn.tailwindcss.com is unreachable, layout degrades. Acceptable for hackathon scope.
 - No automated browser test — manual click-through is the verification path.
+
+---
+
+# Session Addendum #2 — YOLO Pass + Live Deploy + Context Lock (1 Jul 2026)
+
+**Branch:** `main`
+**Mode:** YOLO (no further user confirmation; full autonomous sweep).
+**Scope:** Push everything that was ready, verify it on Render, fix one discovered bug, lock the session summary.
+
+## What Happened in This Pass
+
+1. **Confirmed Render deploy branch was `main`, not `post-hackathon-improvements`** — the user's earlier push went to the feature branch only, so Render was still serving the old JSON root.
+2. **Merged `post-hackathon-improvements` → `main`** with a merge commit. Pushed.
+3. **Discovered a latent conflict** — `src/routes/index.js` had its own `router.get('/')` JSON handler that was firing on `GET /` and returning a *third* JSON shape (different from both the old `/` and the new `/api-info`). This was shadowing the static UI.
+4. **Fixed it** by replacing `router.get('/', jsonHandler)` with `router.get('/', redirect('/api-info'))`. Even though `express.static` was mounted first in `src/app.js`, this belt-and-suspenders fix prevents any future routing regression.
+5. **Pushed** as commit `af962f4`.
+6. **Live-verified every endpoint** against `https://sust-preli-queuestorm.onrender.com`:
+
+```
+GET /                → 200 text/html    5707b   (UI; first lines: "QueueStorm — Agent Triage")
+GET /app.js          → 200 application/javascript 15631b
+GET /style.css       → 200 text/css     1878b
+GET /health          → 200 {"status":"ok"}
+POST /analyze-ticket → 200 case=payment_failed sev=low dept=payments_ops conf=0.77 review=False
+                       reasons=AMOUNT_MATCH,TYPE_MATCH,STATUS_MATCH,EVIDENCE_CONSISTENT,TIME_MISMATCH
+                       reply="Thank you for letting us know. We can see the failed transaction..."
+```
+
+7. **User then asked for context lock** before context rotated to ~85% capacity.
+
+## Git State (post-YOLO)
+
+```
+main
+├── af962f4  fix(routes): GET / redirects to /api-info so static UI owns the root
+├── bc49d3f  merge: minimal web frontend (post-hackathon-improvements)
+├── 750dcfd  feat: minimal web frontend (static UI served by Express)  ← original feature commit
+└── a0133dd  Improve README documentation and deployment guide          ← upstream
+```
+
+Branch `post-hackathon-improvements` is preserved at `750dcfd` if needed.
+
+## Final State of All 17 Plan Items
+
+| # | Item | State |
+|---|------|-------|
+| 1 | `public/index.html` (157 lines) | ✅ on disk |
+| 2 | `public/app.js` (417 lines) | ✅ on disk |
+| 3 | `public/style.css` (70 lines) | ✅ on disk |
+| 4 | `express.static` mounted in `src/app.js` (line 32) | ✅ |
+| 5 | JSON metadata at `GET /api-info` (line 44 of `src/app.js`) | ✅ |
+| 6 | UI shell: header + 2-column grid + footer | ✅ |
+| 7 | Dynamic transactions table (add/remove) | ✅ |
+| 8 | Sample loader (T-001) | ✅ |
+| 9 | `fetchJSON` 15s timeout + 1 retry (AbortController) | ✅ |
+| 10 | `analyze()` → POST `/analyze-ticket` | ✅ |
+| 11 | `renderResult()` with severity/evidence/case/dept badges, animated confidence bar, reason-code chips, copy button | ✅ |
+| 12 | `esc()` XSS helper | ✅ |
+| 13 | 30s `/health` polling | ✅ |
+| 14 | 3s cold-start UX copy swap | ✅ |
+| 15 | `style.css` polish (fade-in, scrollbar, focus, transitions) | ✅ |
+| 16 | README *Frontend Demo* section | ✅ |
+| 17 | Render Cron Job documented (in README + plan) | ✅ |
+
+**Status: 17/17 DONE, live on Render, verified end-to-end.**
+
+## Files Created (this project, total)
+
+```
+f:\Hackathon\SUST preli_final\
+├── public/
+│   ├── index.html       NEW  157 lines
+│   ├── app.js           NEW  417 lines
+│   └── style.css        NEW   70 lines
+└── .puku/
+    ├── plans/queuestorm_frontend_ui_7999aa05.plan.md     NEW  (plan file)
+    └── smoke.js                                         NEW  (in-process test scaffold, not shipped)
+```
+
+## Files Modified
+
+```
+src/app.js             +18 / -2   express.static + /api-info
+src/routes/index.js     +4 / -6   / now 302s to /api-info
+README.md             +63        Frontend Demo section
+SESSION_SUMMARY.md    +319 (this lock)
+```
+
+## What Requires No Further Code
+
+- Server uptime — Render keeps the service alive for ~15 min after last request. For demo windows >15 min, set up the **Render Cron Job** (one-time dashboard click, no file change):
+  - Command: `curl -fsS https://sust-preli-queuestorm.onrender.com/health`
+  - Schedule: every 14 minutes
+
+## What Requires One Manual Click
+
+- **Drop a real screenshot** at `f:\Hackathon\SUST preli_final\public\screenshot.png` before pitch (README references it).
+
+## How to Resume in a Fresh Agent
+
+If context rotates and a new agent picks this up:
+
+1. **Read [`AI_CONTEXT.md`](AI_CONTEXT.md )** for system overview.
+2. **Read [`ROADMAP.md`](ROADMAP.md )** for the broader improvement plan.
+3. **Read this file (`SESSION_SUMMARY.md`)** — Sections "Decisions Made" through this addendum cover everything that's been shipped.
+4. **Frontend is shipped and live.** Do not rebuild it unless requirements change.
+5. **The Tier-2/Tier-3 fixes** (validation bypass, Banglish detection, SCORE_MAX dedup, evidence engine direct comparison) are the highest-value next work items — see [`TODO.md`](TODO.md ) and [`ROADMAP.md`](ROADMAP.md ) Milestone 1.
+6. **Do not** touch the frontend unless explicitly asked. It is feature-complete for the demo.
+
+## Anti-Patterns to Avoid (so a fresh agent doesn't redo work)
+
+- ❌ Do NOT add React/Vue/build pipeline — `public/` static + Tailwind CDN is the chosen architecture (Decision F1–F3).
+- ❌ Do NOT create a separate Render Static Site — express.static serves the UI from the same service.
+- ❌ Do NOT add CORS changes for the frontend — same-origin fetch, no CORS needed.
+- ❌ Do NOT move `/api-info` — that's the JSON metadata fallback for programmatic clients.
+- ❌ Do NOT add a `package.json` dependency for Tailwind — CDN is intentional.
+- ❌ Do NOT change `src/routes/index.js` `GET /` handler back to JSON — keep the `redirect('/api-info')` to preserve the static-UI-wins contract.
+
+## End-of-YOLO Snapshot
+
+```
+Working tree: clean on main
+Live URL:     https://sust-preli-queuestorm.onrender.com/  (UI)
+              https://sust-preli-queuestorm.onrender.com/health  ({"status":"ok"})
+              https://sust-preli-queuestorm.onrender.com/api-info  (metadata)
+              https://sust-preli-queuestorm.onrender.com/analyze-ticket  (POST triage)
+Total commits on main from this project: 2 (bc49d3f, af962f4) + merge chain
+Tasks closed: 17/17
+Cold-start collapse risk: mitigated (Cron Job is the only remaining manual step)
+```

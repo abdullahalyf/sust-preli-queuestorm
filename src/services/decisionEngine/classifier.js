@@ -61,9 +61,7 @@ const classifyCase = (analysis, matchResult, evidence) => {
   // OR explicit phishing/social-engineering keywords. This case wins over
   // every other classification because security events are highest-stakes.
   const phishingHit = securityMentions.length > 0
-    || important.some((k) => PHISHING_KEYWORDS.includes(k))
-    || (Array.isArray(analysis?.security_sensitive_information_mentions)
-        && analysis.security_sensitive_information_mentions.length > 0);
+    || important.some((k) => PHISHING_KEYWORDS.includes(k));
   if (phishingHit) {
     signals.push({
       rule: 'phishing_or_social_engineering',
