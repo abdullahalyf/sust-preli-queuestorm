@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -24,15 +25,28 @@ if (config.env !== 'test') {
 }
 app.use(requestLogger);
 
+// --- Static frontend (public/) ---
+// Serves index.html, app.js, style.css. Mounted BEFORE the API router
+// so GET / returns the UI. JSON metadata is exposed at /api-info.
+const publicDir = path.join(__dirname, '..', 'public');
+app.use(
+  express.static(publicDir, {
+    maxAge: '1h',
+    index: 'index.html',
+    extensions: ['html'],
+  })
+);
+
 // --- Routes ---
 app.use(config.apiPrefix, apiRouter);
 
-// Root
-app.get('/', (_req, res) => {
+// JSON metadata — moved from "/" so the UI gets the root.
+app.get('/api-info', (_req, res) => {
   res.json({
     name: 'QueueStorm Investigator API',
     status: 'running',
     docs: `${config.apiPrefix}/`,
+    frontend: '/',
   });
 });
 

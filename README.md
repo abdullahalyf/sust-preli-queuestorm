@@ -305,6 +305,69 @@ Health Endpoint
 https://sust-preli-queuestorm.onrender.com/health
 ```
 
+JSON Metadata Endpoint
+
+```
+https://sust-preli-queuestorm.onrender.com/api-info
+```
+
+---
+
+# Frontend Demo
+
+A minimal interactive UI is served from the same Express app at the root URL.
+
+```
+https://sust-preli-queuestorm.onrender.com/
+```
+
+The UI is a single-page app that talks to `POST /analyze-ticket` over the same origin — no API keys, no CORS dance.
+
+![QueueStorm UI — preview screenshot](./public/screenshot.png)
+
+## Features
+
+* Dark "copilot" aesthetic with emerald accents
+* Live backend health pill (polls `GET /health` every 30s)
+* Dynamic transactions table (add / remove rows)
+* One-click **Load sample** (pre-fills the `T-001` example)
+* Animated confidence bar
+* Color-coded severity and evidence verdict badges
+* Copy-to-clipboard on the customer reply
+* Cold-start UX: spinner copy swaps to *"Waking up backend…"* after 3s to set expectations on Render's free tier
+* XSS-safe: every interpolated string is escaped before `innerHTML`
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+# open http://localhost:3000
+```
+
+Click **Load sample** → **Analyze ▶** to see a full investigation flow.
+
+## Cold-start mitigation
+
+Render's free tier sleeps services after ~15 minutes of inactivity, causing 30–50s cold starts on the next request. To prevent demo-time collapse:
+
+1. **Render Cron Job** — create one in the Render dashboard:
+   - Command: `curl -fsS https://sust-preli-queuestorm.onrender.com/health`
+   - Schedule: every 14 minutes
+   - This keeps the service warm during judging windows.
+2. **Client timeout + retry** — every fetch from the UI uses a 15s timeout with 1 retry, so transient cold starts are absorbed gracefully.
+3. **Live health pill** — judges can see at a glance whether the backend is awake.
+
+## File map
+
+```
+public/
+├── index.html      # UI shell (Tailwind via CDN, no build step)
+├── app.js          # Form state, fetch wrapper, result renderer, health polling
+└── style.css       # Minimal polish (transitions, scrollbar, fade-in)
+src/app.js          # Adds express.static(public/) — JSON root moved to /api-info
+```
+
 ---
 
 # Repository
