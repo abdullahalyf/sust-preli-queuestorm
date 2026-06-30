@@ -42,6 +42,32 @@
   // --- Reduced-motion gate ---
   const REDUCED_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // --- Ticker tape (fintech ambient) ---
+  const TICKERS = [
+    { s: "USD/BDT", p: "118.42", c: "up" },
+    { s: "EUR/USD", p: "1.0843", c: "up" },
+    { s: "BTC/USD", p: "67,842.10", c: "up" },
+    { s: "ETH/USD", p: "3,512.66", c: "down" },
+    { s: "GOLD", p: "2,348.40", c: "up" },
+    { s: "AAPL", p: "212.84", c: "down" },
+    { s: "DJIA", p: "39,127.62", c: "neutral" },
+    { s: "S&P 500", p: "5,228.45", c: "up" },
+    { s: "TSLA", p: "178.21", c: "down" },
+    { s: "GOOGL", p: "172.55", c: "up" },
+    { s: "BRENT", p: "83.12", c: "neutral" },
+    { s: "10Y", p: "4.41%", c: "down" },
+    { s: "DXY", p: "105.83", c: "up" },
+    { s: "XAU/BDT", p: "277,118", c: "up" },
+    { s: "NIFTY", p: "24,135.95", c: "up" },
+  ];
+  function paintTickers() {
+    const track = $("#tickerTrack");
+    if (!track) return;
+    const fmt = (t) => `<span class="${t.c}">${esc(t.s)} ${esc(t.p)}</span><span class="sep">|</span>`;
+    // Duplicate set so the 60s scroll loops seamlessly without a jump.
+    track.innerHTML = TICKERS.map(fmt).join("") + TICKERS.map(fmt).join("");
+  }
+
   // --- Icons ---
   function paintIcons() {
     if (!window.QSIcons) return;
@@ -539,6 +565,7 @@
     });
 
     // Initial paint
+    paintTickers();
     paintIcons();
     addTxRow();
     setStage(null);

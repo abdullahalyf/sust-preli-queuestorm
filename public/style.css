@@ -6,19 +6,27 @@
 :root {
   --emerald: #10b981;
   --emerald-soft: #34d399;
+  --mint: #5eead4;
   --cyan: #22d3ee;
+  --cyan-soft: #67e8f9;
   --rose: #fb7185;
   --amber: #fbbf24;
+  --gold: #f5d76e;
   --slate-950: #020617;
+  --navy-950: #050b1a;
+  --navy-900: #0a1428;
+  --navy-800: #0f1e3d;
   --slate-900: #0f172a;
   --slate-800: #1e293b;
   --slate-700: #334155;
   --slate-400: #94a3b8;
   --slate-200: #e2e8f0;
+  /* Fintech accent gradient — mint to cyan */
+  --accent-grad: linear-gradient(135deg, #34d399 0%, #22d3ee 100%);
 }
 
 html {
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "tnum";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -26,65 +34,176 @@ html {
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   position: relative;
-  background: var(--slate-950);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, #0a1f3d 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 100% 100%, #082017 0%, transparent 60%),
+    linear-gradient(180deg, #050b1a 0%, #020617 50%, #050b1a 100%);
+  background-attachment: fixed;
+  color: var(--slate-200);
 }
 
 input, textarea { caret-color: var(--emerald-soft); }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-input[type="number"] { -moz-appearance: textfield; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 ::selection { background: rgba(16, 185, 129, 0.3); color: #f8fafc; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--slate-800); border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--slate-700); }
 
-/* ============ Aurora background ============ */
+/* ============ Fintech cockpit background ============ */
+/* Layer 1: ambient glow + grid + price line + tickers. Each ::before / ::after / child
+ * adds depth: ambient haze, geometric grid, faint currency ticks, animated price line. */
+
 .aurora {
   position: fixed;
-  inset: -20%;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(16, 185, 129, 0.18), transparent 60%),
-    radial-gradient(ellipse 40% 35% at 80% 20%, rgba(34, 211, 238, 0.14), transparent 60%),
-    radial-gradient(ellipse 45% 40% at 70% 80%, rgba(99, 102, 241, 0.12), transparent 60%),
-    radial-gradient(ellipse 35% 30% at 10% 90%, rgba(244, 114, 182, 0.08), transparent 60%);
-  filter: blur(20px);
-  animation: auroraDrift 40s ease-in-out infinite alternate;
+    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(16, 185, 129, 0.16), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 30%, rgba(34, 211, 238, 0.14), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 70% 85%, rgba(94, 234, 212, 0.10), transparent 60%),
+    radial-gradient(ellipse 40% 35% at 10% 95%, rgba(99, 102, 241, 0.10), transparent 60%);
+  animation: auroraDrift 48s ease-in-out infinite alternate;
 }
-.aurora::after {
+
+/* Layer 2: precise financial grid (fintech blueprint look) */
+.aurora::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    /* Major vertical lines every 120px */
+    linear-gradient(to right, rgba(52, 211, 153, 0.06) 1px, transparent 1px),
+    /* Minor vertical lines every 24px */
+    linear-gradient(to right, rgba(148, 163, 184, 0.025) 1px, transparent 1px),
+    /* Major horizontal lines every 120px */
+    linear-gradient(to bottom, rgba(52, 211, 153, 0.06) 1px, transparent 1px),
+    /* Minor horizontal lines every 24px */
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.025) 1px, transparent 1px);
+  background-size: 120px 120px, 24px 24px, 120px 120px, 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 30%, transparent 85%);
+  animation: gridPulse 12s ease-in-out infinite;
 }
+
+/* Layer 3: faint animated price-line wave across the bottom (SVG path drawn in JS or static fallback below) */
+.aurora::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -2%;
+  height: 38%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='0'><stop offset='0' stop-color='%2334d399' stop-opacity='0'/><stop offset='0.4' stop-color='%2334d399' stop-opacity='0.55'/><stop offset='0.7' stop-color='%2322d3ee' stop-opacity='0.55'/><stop offset='1' stop-color='%2322d3ee' stop-opacity='0'/></linearGradient></defs><path d='M0,140 C100,120 180,160 260,130 C340,100 420,150 520,110 C620,70 720,140 820,95 C920,50 1020,130 1100,80 L1200,70' fill='none' stroke='url(%23g)' stroke-width='2'/><path d='M0,165 C100,150 180,175 260,150 C340,125 420,170 520,140 C620,110 720,170 820,135 C920,100 1020,170 1100,130 L1200,125' fill='none' stroke='url(%23g)' stroke-width='1.2' opacity='0.6'/></svg>");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: blur(0.5px);
+  opacity: 0.7;
+  animation: waveDrift 28s linear infinite;
+}
+
+/* Layer 4: tickers — fixed-position horizontal currency strip near the top */
+.aurora-tickers {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 64px; /* below header */
+  height: 22px;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  opacity: 0.42;
+}
+.aurora-tickers .ticker-track {
+  display: inline-flex;
+  gap: 36px;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+  animation: tickerScroll 60s linear infinite;
+  padding-left: 100%;
+}
+.aurora-tickers .ticker-track .up { color: var(--emerald-soft); }
+.aurora-tickers .ticker-track .down { color: var(--rose); }
+.aurora-tickers .ticker-track .neutral { color: var(--cyan-soft); }
+.aurora-tickers .ticker-track .sep { color: rgba(148, 163, 184, 0.4); }
+
 @keyframes auroraDrift {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50%  { transform: translate3d(-3%, 2%, 0) rotate(2deg); }
+  50%  { transform: translate3d(-2%, 2%, 0) rotate(1.5deg); }
   100% { transform: translate3d(2%, -1%, 0) rotate(-1deg); }
+}
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.95; }
+  50%      { opacity: 0.7; }
+}
+@keyframes waveDrift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-25%); }
+}
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Hide tickers on short viewports so they never push content */
+@media (max-height: 720px) { .aurora-tickers { display: none; } }
+
+/* Fintech header accent */
+.fintech-title-glow {
+  background: linear-gradient(120deg, #6ee7b7 0%, #5eead4 35%, #67e8f9 70%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.01em;
+}
+
+/* Top hairline accent that sits at the very top of the page (like a bank dashboard) */
+.fintech-topline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, #10b981 25%, #22d3ee 50%, #5eead4 75%, transparent 100%);
+  background-size: 200% 100%;
+  animation: toplineShimmer 8s ease-in-out infinite;
+  opacity: 0.85;
+}
+@keyframes toplineShimmer {
+  0%, 100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
 }
 
 /* ============ Glass panel ============ */
 .glass {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.62));
+  background:
+    linear-gradient(180deg, rgba(10, 20, 40, 0.78), rgba(5, 11, 26, 0.62)),
+    linear-gradient(135deg, rgba(52, 211, 153, 0.04) 0%, transparent 50%, rgba(34, 211, 238, 0.04) 100%);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.10);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 24px 48px -24px rgba(0, 0, 0, 0.6);
+    0 0 0 1px rgba(94, 234, 212, 0.04) inset,
+    0 24px 48px -24px rgba(0, 0, 0, 0.7);
 }
 .glass-soft {
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(10, 20, 40, 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.07);
 }
 
 /* ============ Header health radar ============ */

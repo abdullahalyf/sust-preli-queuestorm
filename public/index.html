@@ -9,8 +9,16 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
-    <!-- Aurora background layer -->
+    <!-- Top hairline accent (bank-dashboard style) -->
+    <div class="fintech-topline" aria-hidden="true"></div>
+
+    <!-- Fintech cockpit background: ambient glow + grid + price wave -->
     <div class="aurora" aria-hidden="true"></div>
+
+    <!-- Static-look ticker tape (animated in CSS, zero JS) -->
+    <div class="aurora-tickers" aria-hidden="true">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
 
     <!-- Header -->
     <header class="sticky top-0 z-20">
@@ -19,12 +27,13 @@
           <div class="flex items-center gap-3">
             <span class="qsi-icon qsi-icon-lg text-emerald-400" data-icon="bolt"></span>
             <div>
-              <h1 class="text-base font-semibold tracking-tight text-slate-100">QueueStorm Investigator</h1>
+              <h1 class="text-base font-semibold tracking-tight text-slate-100">QueueStorm <span class="fintech-title-glow">Investigator</span></h1>
               <p class="text-[11px] text-slate-400 -mt-0.5 tracking-wide">Evidence-based fintech support triage</p>
             </div>
           </div>
           <div class="flex items-center gap-3">
-            <span class="hidden md:inline text-[10px] uppercase tracking-[0.18em] px-2.5 py-1 rounded-md bg-slate-800/60 text-slate-400 border border-slate-700/60">
+            <span class="hidden md:inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] px-2.5 py-1 rounded-md bg-slate-900/70 text-slate-300 border border-emerald-500/20 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               SUST Preli · 2026
             </span>
             <span id="healthPill" class="text-[11px] px-3 py-1.5 rounded-full glass-soft text-slate-300 flex items-center gap-2 transition">
