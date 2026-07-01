@@ -1,3 +1,10 @@
+## 📄 Original Hackathon Problem
+
+The complete problem statement used for this project is available here:
+
+➡️ **[PROBLEM_STATEMENT.md](./PROBLEM_STATEMENT.md)**
+
+
 # QueueStorm Investigator
 
 AI-powered FinTech Support Investigation API built for the **SUST CSE Carnival 2026 - Codex Community Hackathon (Online Preliminary Round)**.
