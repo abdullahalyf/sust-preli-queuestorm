@@ -47,3 +47,8 @@ SESSION_SUMMARY.md
 *.tmp
 *.temp
 *.tmp.md
+
+
+#session summary 
+SESSION_SUMMARY.local.md
+session_append.tmp.md
