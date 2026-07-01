@@ -1,11 +1,28 @@
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![Express](https://img.shields.io/badge/Express-4.x-black)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Deploy](https://img.shields.io/badge/Deploy-Vercel-black)
+![Hackathon](https://img.shields.io/badge/Hackathon-SUST%202026-orange)
+
+<p align="center">
+<img src="public/logo.png" width="180"/>
+</p>
+
+<h1 align="center">
+QueueStorm Investigator
+</h1>
+
+<p align="center">
+AI-powered FinTech Support Investigation API
+</p>
+
+
 ## 📄 Original Hackathon Problem
 
 The complete problem statement used for this project is available here:
 
 ➡️ **[PROBLEM_STATEMENT.md](./PROBLEM_STATEMENT.md)**
 
-
-# QueueStorm Investigator
 
 AI-powered FinTech Support Investigation API built for the **SUST CSE Carnival 2026 - Codex Community Hackathon (Online Preliminary Round)**.
 
